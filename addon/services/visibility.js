@@ -1,7 +1,7 @@
 import Service from '@ember/service';
 import { isPresent } from '@ember/utils';
 import { tracked } from "@glimmer/tracking";
-
+import { action } from '@ember/object';
 export const APIs = {
   global: { isSupported: true, hiddenFlag: 'hidden', eventName: 'visibilitychange' },
   webkit: { isSupported: true, hiddenFlag: 'webkitHidden', eventName: 'webkitvisibilitychange' },
@@ -52,9 +52,9 @@ class VisibilityService extends Service {
     const { isSupported, eventName } = this.pageVisibilityAPI;
 
     if (isSupported) {
-      this.#handleDocumentVisibilityChange();
+      this._handleDocumentVisibilityChange();
 
-      document.addEventListener(eventName, this.#handleDocumentVisibilityChange);
+      document.addEventListener(eventName, this._handleDocumentVisibilityChange);
     }
   }
 
@@ -74,14 +74,15 @@ class VisibilityService extends Service {
     const { isSupported, eventName } = this.pageVisibilityAPI;
 
     if (isSupported) {
-      document.removeEventListener(eventName, this.#handleDocumentVisibilityChange);
+      document.removeEventListener(eventName, this._handleDocumentVisibilityChange);
     }
   }
 
   /**
    * Event handler.
    */
-  #handleDocumentVisibilityChange() {
+  @action
+  _handleDocumentVisibilityChange() {
     if (this.isDestroyed || this.isDestroying) { return; }
 
     const hiddenFlagName = this.pageVisibilityAPI.hiddenFlag;
