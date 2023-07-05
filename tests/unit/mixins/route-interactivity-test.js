@@ -1,6 +1,5 @@
-import { module } from 'qunit';
-import { setupTest } from 'ember-qunit';
-import test from 'ember-sinon-qunit/test-support/test';
+import { module, test } from 'qunit';
+import {setupApplicationTest, setupTest} from 'ember-qunit';
 import { waitUntil } from '@ember/test-helpers';
 import RSVP from 'rsvp';
 import EmberObject from '@ember/object';
@@ -9,6 +8,7 @@ import { setOwner } from '@ember/application';
 import { run } from '@ember/runloop';
 import RouteInteractivityMixin from 'ember-interactivity/mixins/route-interactivity';
 import MockInteractivityTrackingService from 'ember-interactivity/test-support/mock-interactivity-tracking-service';
+import sinon from 'sinon';
 
 const ROUTE_NAME = 'foo.bar';
 const CRITICAL_COMPONENTS = ['foo', 'bar'];
@@ -28,8 +28,6 @@ const InteractivityStub = Service.extend({
   unsubscribeRoute() {}
 });
 
-const VisibilityStub = Service.extend({ lostVisibility: false });
-
 module('Unit | Mixin | route interactivity', function (hooks) {
   setupTest(hooks);
 
@@ -37,7 +35,6 @@ module('Unit | Mixin | route interactivity', function (hooks) {
     this.BaseObject = EmberObject.extend(RouteInteractivityMixin, {
       fullRouteName: ROUTE_NAME,
       criticalComponents: CRITICAL_COMPONENTS,
-      documentVisibility: VisibilityStub.create(),
       interactivity: InteractivityStub.create(),
       interactivityTracking: MockInteractivityTrackingService.create(),
     });
@@ -98,7 +95,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
 
     let phase = 'Yarrr';
     let targetName = 'Narf';
-    let lostVisibility = subject.get('documentVisibility.lostVisibility');
+    let lostVisibility = subject.get('visibility.lostVisibility');
     let additionalData = { foo: 'bar' };
 
     subject._sendTransitionEvent(phase, targetName, additionalData);
@@ -123,7 +120,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
     setOwner(subject, this.owner);
     let interactivity = subject.get('interactivity');
 
-    let spy = this.spy(interactivity, 'subscribeRoute');
+    let spy = sinon.spy(interactivity, 'subscribeRoute');
 
     subject._monitorInteractivity();
 
@@ -133,7 +130,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
     let { args } = spy.firstCall;
     assert.equal(typeof(args[0].isInteractive), 'function', 'isInteractive method passed');
 
-    let stub = this.stub(subject, '_sendTransitionCompleteEvent');
+    let stub = sinon.stub(subject, '_sendTransitionCompleteEvent');
 
     resolve();
 
@@ -155,7 +152,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
 
     subject._monitorInteractivity();
 
-    let stub = this.stub(subject, '_sendTransitionCompleteEvent');
+    let stub = sinon.stub(subject, '_sendTransitionCompleteEvent');
 
     subject.set('_monitoringInteractivity', false);
     resolve();
@@ -170,7 +167,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
   test('didTransition - not leaf route', function (assert) {
     let subject = this.BaseObject.create();
     setOwner(subject, this.owner);
-    let stub = this.stub(subject, '_isLeafRoute').callsFake(() => false);
+    let stub = sinon.stub(subject, '_isLeafRoute').callsFake(() => false);
 
     let result = subject.actions.didTransition.call(subject);
 
@@ -179,11 +176,11 @@ module('Unit | Mixin | route interactivity', function (hooks) {
   });
 
   test('didTransition - default', function (assert) {
-    let stub = this.stub(run, 'scheduleOnce');
+    let stub = sinon.stub(run, 'scheduleOnce');
 
     let subject = this.BaseObject.create();
     setOwner(subject, this.owner);
-    this.stub(subject, '_isLeafRoute').callsFake(() => true);
+    sinon.stub(subject, '_isLeafRoute').callsFake(() => true);
 
     subject.actions.didTransition.call(subject);
 
@@ -199,9 +196,9 @@ module('Unit | Mixin | route interactivity', function (hooks) {
       isInteractive() {}
     });
     setOwner(subject, this.owner);
-    this.stub(subject, '_isLeafRoute').callsFake(() => true);
+    sinon.stub(subject, '_isLeafRoute').callsFake(() => true);
 
-    let stub = this.stub(subject, '_monitorInteractivity');
+    let stub = sinon.stub(subject, '_monitorInteractivity');
 
     subject.actions.didTransition.call(subject);
 
@@ -211,7 +208,7 @@ module('Unit | Mixin | route interactivity', function (hooks) {
   test('_sendTransitionCompleteEvent', function (assert) {
     let subject = this.BaseObject.create();
     setOwner(subject, this.owner);
-    let sendTransitionStub = this.stub(subject, '_sendTransitionEvent');
+    let sendTransitionStub = sinon.stub(subject, '_sendTransitionEvent');
 
     subject._resetHasFirstTransitionCompleted();
 

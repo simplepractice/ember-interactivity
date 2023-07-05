@@ -6,7 +6,6 @@ import Mixin from '@ember/object/mixin';
 import { assign } from '@ember/polyfills';
 import { bind } from '@ember/runloop';
 import { inject as injectService } from '@ember/service';
-import IsFastbootMixin from 'ember-is-fastboot/mixins/is-fastboot';
 import getConfig from 'ember-interactivity/utils/config';
 import { getTimeAsFloat } from 'ember-interactivity/utils/date';
 import {
@@ -14,15 +13,21 @@ import {
   getLatencyReportingName
 } from 'ember-interactivity/utils/interactivity';
 import { INITIALIZING_LABEL, INTERACTIVE_LABEL, markTimeline } from 'ember-interactivity/utils/timeline-marking';
+import { getOwner } from '@ember/application';
 
 /**
  * For components that should inform the interactivity service that they are now ready for user interaction.
  *
  * In your component, you MUST call `reportInteractive` or define `isInteractive`.
  */
-export default Mixin.create(IsFastbootMixin, {
+export default Mixin.create({
   interactivity: injectService(),
   interactivityTracking: injectService(),
+
+  _isFastBoot: computed(function() {
+    let owner = getOwner(this);
+    return owner.lookup?.('service:fastboot')?.isFastBoot;
+  }),
 
   /**
    * A component may implement the method isInteractive, which returns true if all conditions for interactivity have been met

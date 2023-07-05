@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-interactivity'
+  name: require('./package').name
 };

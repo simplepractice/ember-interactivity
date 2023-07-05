@@ -2,12 +2,13 @@ import Ember from 'ember';
 import Mixin from '@ember/object/mixin';
 import { on } from '@ember/object/evented';
 import { assign } from '@ember/polyfills';
+import { getOwner } from '@ember/application';
 import { run } from '@ember/runloop';
 import { inject as injectService } from '@ember/service';
-import IsFastbootMixin from 'ember-is-fastboot/mixins/is-fastboot';
 import getConfig from 'ember-interactivity/utils/config';
 import { getTimeAsFloat } from 'ember-interactivity/utils/date';
 import { INITIALIZING_LABEL, INTERACTIVE_LABEL, markTimeline } from 'ember-interactivity/utils/timeline-marking';
+import { computed } from '@ember/object';
 
 let hasFirstTransitionCompleted = false;
 
@@ -19,11 +20,15 @@ let hasFirstTransitionCompleted = false;
  *   2.) execute  (i.e. we are executing the transition by activating the route and scheduling render tasks)
  *   3.) interactive (i.e. we have completed the transition and the route is now interactive)
  */
-export default Mixin.create(IsFastbootMixin, {
+export default Mixin.create({
   interactivity: injectService(),
   interactivityTracking: injectService(),
   visibility: injectService(),
 
+  _isFastBoot: computed(function() {
+    let owner = getOwner(this);
+    return owner.lookup?.('service:fastboot')?.isFastBoot;
+  }),
   /**
    * A route may implement the method isInteractive, which returns true if all conditions for interactivity have been met
    *
@@ -108,8 +113,8 @@ export default Mixin.create(IsFastbootMixin, {
     let baseData = {
       event: `route${phase}`,
       destination: targetName,
-      routeName: this.get('fullRouteName'),
-      lostVisibility: this.get('documentVisibility.lostVisibility'),
+      routeName: this.fullRouteName,
+      lostVisibility: this.visibility.lostVisibility,
       clientTime: getTimeAsFloat()
     };
 

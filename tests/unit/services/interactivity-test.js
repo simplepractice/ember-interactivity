@@ -1,7 +1,7 @@
-import { module } from 'qunit';
+import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import test from 'ember-sinon-qunit/test-support/test';
 import EmberObject from '@ember/object';
+import sinon from 'sinon'
 
 let service;
 
@@ -106,7 +106,7 @@ module('Unit | Service | interactivity', function (hooks) {
       }
     });
 
-    let isInteractiveSpy = this.spy(mockSubscriber, 'isInteractive');
+    let isInteractiveSpy = sinon.spy(mockSubscriber, 'isInteractive');
 
     let parentView = {
       parentView: {

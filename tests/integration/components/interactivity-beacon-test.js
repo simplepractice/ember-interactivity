@@ -1,11 +1,10 @@
-import { module } from 'ember-qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { clearRender, render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
-import test from 'ember-sinon-qunit/test-support/test';
+import { hbs } from 'ember-cli-htmlbars';
 import MockInteractivityService from 'ember-interactivity/test-support/mock-interactivity-service';
 import MockInteractivityTrackingService from 'ember-interactivity/test-support/mock-interactivity-tracking-service';
-
+import sinon from 'sinon'
 module('Integration | Component | interactivity beacon', function (hooks) {
   setupRenderingTest(hooks);
 
@@ -18,8 +17,8 @@ module('Integration | Component | interactivity beacon', function (hooks) {
     assert.expect(5);
 
     let interactivityService = this.owner.__container__.lookup('service:interactivity');
-    let didReporterBecomeInteractiveSpy = this.spy(interactivityService, 'didReporterBecomeInteractive');
-    let didReporterBecomeNonInteractiveSpy = this.spy(interactivityService, 'didReporterBecomeNonInteractive');
+    let didReporterBecomeInteractiveSpy = sinon.spy(interactivityService, 'didReporterBecomeInteractive');
+    let didReporterBecomeNonInteractiveSpy = sinon.spy(interactivityService, 'didReporterBecomeNonInteractive');
 
     this.set('beaconId', 'myBeaconId');
     await render(hbs('{{interactivity-beacon beaconId=beaconId}}'));
