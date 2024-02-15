@@ -1,9 +1,8 @@
 import Ember from 'ember';
 import Mixin from '@ember/object/mixin';
 import { on } from '@ember/object/evented';
-import { assign } from '@ember/polyfills';
 import { getOwner } from '@ember/application';
-import { run } from '@ember/runloop';
+import { bind, scheduleOnce } from '@ember/runloop';
 import { inject as injectService } from '@ember/service';
 import getConfig from 'ember-interactivity/utils/config';
 import { getTimeAsFloat } from 'ember-interactivity/utils/date';
@@ -74,7 +73,7 @@ export default Mixin.create({
    * @private
    */
   _monitorInteractivity() {
-    let isInteractive = this.isInteractive ? run.bind(this, this.isInteractive) : null;
+    let isInteractive = this.isInteractive ? bind(this, this.isInteractive) : null;
     let options = {
       isInteractive,
       name: this.get('fullRouteName')
@@ -118,7 +117,7 @@ export default Mixin.create({
       clientTime: getTimeAsFloat()
     };
 
-    this.get('interactivityTracking').trackRoute(assign(baseData, data));
+    this.get('interactivityTracking').trackRoute(Object.assign(baseData, data));
   },
 
   /**
@@ -204,7 +203,7 @@ export default Mixin.create({
       return;
     }
 
-    markTimeline(type, run.bind(this, this._getTimelineLabel));
+    markTimeline(type, bind(this, this._getTimelineLabel));
   },
 
   _isFeaturedDisabled(type) {
@@ -235,7 +234,7 @@ export default Mixin.create({
         if (typeof(this.isInteractive) === 'function') {
           this._monitorInteractivity();
         } else {
-          run.scheduleOnce('afterRender', this, this._sendTransitionCompleteEvent);
+          scheduleOnce('afterRender', this, this._sendTransitionCompleteEvent);
         }
       }
 

@@ -3,7 +3,6 @@ import { assert } from '@ember/debug';
 import { computed } from '@ember/object';
 import { on } from '@ember/object/evented';
 import Mixin from '@ember/object/mixin';
-import { assign } from '@ember/polyfills';
 import { bind } from '@ember/runloop';
 import { inject as injectService } from '@ember/service';
 import getConfig from 'ember-interactivity/utils/config';
@@ -199,7 +198,7 @@ export default Mixin.create({
       return;
     }
 
-    this.get('interactivityTracking').trackComponent(assign({
+    this.get('interactivityTracking').trackComponent(Object.assign({
       event: name,
       component: this.get('_latencyReportingName'),
       componentId: this.get('_latencySubscriptionId')
