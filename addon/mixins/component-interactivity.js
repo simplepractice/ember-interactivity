@@ -164,7 +164,8 @@ export default Mixin.create({
    * @return {string} The timeline label
    */
   _getTimelineLabel(type) { // BUG: Components that have "component" in their name will not have a unique label, due to the parsing logic below
-    let latencyId = this.get('_latencySubscriptionId').split('component:')[1].slice(0, -1); // Make the component name more readable but still unique
+    // let latencyId = this.get('_latencySubscriptionId').split('component:')[1].slice(0, -1); // Make the component name more readable but still unique
+    let latencyId = this.get('_latencySubscriptionId');
     return `Component ${type}: ${latencyId}`;
   },
 

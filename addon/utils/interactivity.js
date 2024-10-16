@@ -18,7 +18,7 @@
  */
 
 export function getLatencyReportingName(component) {
-  return component.toString().split(':')[1];
+  return component.constructor.name;
 }
 
 /**
@@ -31,5 +31,5 @@ export function getLatencyReportingName(component) {
  * @return {string} The unique id of the component
  */
 export function getLatencySubscriptionId(component) {
-  return component.toString();
+  return `${component.constructor.name}#${component.toString()}`;
 }
